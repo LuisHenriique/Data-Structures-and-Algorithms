@@ -3,11 +3,11 @@
 #include <stdbool.h>
 #include "item.h"
 #include "Pilha.h"
+
 int main()
 {
   // criar pilha
   PILHA *pilha;
-  ITEM *item;
   pilha = pilha_criar();
 
   // n casos testes
@@ -18,18 +18,21 @@ int main()
   int i = 0;
   while (i < n)
   {
+    bool result;
     char stringInput[1000];
     scanf(" %s", stringInput);
-    if (balanceada(stringInput))
+    result = (balanceada(stringInput));
+    if (result)
     {
-      printf("BALANCEADA");
+      printf("BALANCEADA\n");
     }
     else
     {
-      printf("NÃO BALANCEADA");
+      printf("NÃO BALANCEADA\n");
     }
 
     i++;
   }
+  pilha_apagar(&pilha);
   return 0;
 }

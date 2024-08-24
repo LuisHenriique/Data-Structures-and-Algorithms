@@ -24,7 +24,7 @@ PILHA *pilha_criar(void)
 
 void pilha_apagar(PILHA **pilha)
 {
-  if (*pilha != NULL && pilha != NULL)
+  if (*pilha != NULL)
   {
     free(*pilha);
     *pilha = NULL;
@@ -54,7 +54,11 @@ int pilha_tamanho(PILHA *pilha)
 
 ITEM *pilha_topo(PILHA *pilha)
 {
-  return (pilha != NULL) ? pilha->item[pilha->length - 1] : NULL;
+  if (pilha == NULL || (pilha_tamanho(pilha) == 0))
+  {
+    return NULL;
+  }
+  return (pilha->item[pilha->length - 1]);
 }
 
 bool pilha_empilhar(PILHA *pilha, ITEM *item)
@@ -94,22 +98,25 @@ bool balanceada(char *sequencia)
   {
     if (caractereAtual == '(' || caractereAtual == '{' || caractereAtual == '[')
     {
-      ITEM *item = item_criar(i, &caractereAtual);
+      char *char_copia = malloc(sizeof(char)); // Cria uma cópia do caractere
+      *char_copia = caractereAtual;            // Copia o valor do caractere
+      ITEM *item = item_criar(i, char_copia);
       pilha_empilhar(pilha, item);
     }
-    if (caractereAtual == ')' || caractereAtual == '}' || caractereAtual == ']')
+    else if (caractereAtual == ')' || caractereAtual == '}' || caractereAtual == ']')
     {
       if (pilha_vazia(pilha))
       {
         pilha_apagar(&pilha);
-
         return false;
       }
 
       ITEM *top = pilha_topo(pilha);
       char *caracters = item_get_dados(top);
 
-      if (caractereAtual == ']' && *caracters == '[' || caractereAtual == '}' && *caracters == '{' || caractereAtual == ')' && *caracters == '(')
+      if ((caractereAtual == ']' && *caracters == '[') ||
+          (caractereAtual == '}' && *caracters == '{') ||
+          (caractereAtual == ')' && *caracters == '('))
       {
         pilha_desempilhar(pilha);
       }

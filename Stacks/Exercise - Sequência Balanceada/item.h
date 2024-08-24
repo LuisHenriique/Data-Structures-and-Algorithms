@@ -3,7 +3,7 @@
 
 #include <stdbool.h>
 
-typedef struct item ITEM;
+typedef struct item_ ITEM;
 
 ITEM *item_criar(int chave, void *comp);
 bool item_apagar(ITEM **item);
