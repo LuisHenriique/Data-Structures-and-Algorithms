@@ -1,9 +1,9 @@
-#include <item.h>
+#include "item.h"
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
-struct item_
+struct item
 {
   int chave;
   void *dados;

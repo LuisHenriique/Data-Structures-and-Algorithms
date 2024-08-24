@@ -1,7 +1,8 @@
 #include <stdlib.h>
 #include <stdio.h>
-#include <Pilha.h>
-#include <item.h>
+#include <stdbool.h>
+#include "Pilha.h"
+#include "item.h"
 
 struct pilha
 {
@@ -27,8 +28,6 @@ void pilha_apagar(PILHA **pilha)
   {
     free(*pilha);
     *pilha = NULL;
-
-    return NULL;
   }
 }
 
@@ -55,7 +54,7 @@ int pilha_tamanho(PILHA *pilha)
 
 ITEM *pilha_topo(PILHA *pilha)
 {
-  return (pilha != NULL) ? pilha->item[pilha->length] : NULL;
+  return (pilha != NULL) ? pilha->item[pilha->length - 1] : NULL;
 }
 
 bool pilha_empilhar(PILHA *pilha, ITEM *item)
@@ -74,7 +73,7 @@ ITEM *pilha_desempilhar(PILHA *pilha)
 {
 
   ITEM *i;
-  if (pilha_apagar != NULL && !(pilha_vazia(pilha)))
+  if (pilha != NULL && !(pilha_vazia(pilha)))
   {
     i = pilha_topo(pilha);
     pilha->item[pilha->length - 1] = NULL;
@@ -88,4 +87,40 @@ ITEM *pilha_desempilhar(PILHA *pilha)
 
 bool balanceada(char *sequencia)
 {
+  PILHA *pilha = pilha_criar();
+  char caractereAtual;
+  int i;
+  for (i = 0; (caractereAtual = sequencia[i]) != '\0'; i++)
+  {
+    if (caractereAtual == '(' || caractereAtual == '{' || caractereAtual == '[')
+    {
+      ITEM *item = item_criar(i, &caractereAtual);
+      pilha_empilhar(pilha, item);
+    }
+    if (caractereAtual == ')' || caractereAtual == '}' || caractereAtual == ']')
+    {
+      if (pilha_vazia(pilha))
+      {
+        pilha_apagar(&pilha);
+
+        return false;
+      }
+
+      ITEM *top = pilha_topo(pilha);
+      char *caracters = item_get_dados(top);
+
+      if (caractereAtual == ']' && *caracters == '[' || caractereAtual == '}' && *caracters == '{' || caractereAtual == ')' && *caracters == '(')
+      {
+        pilha_desempilhar(pilha);
+      }
+      else
+      {
+        pilha_apagar(&pilha);
+        return false;
+      }
+    }
+  }
+  bool result = pilha_vazia(pilha);
+  pilha_apagar(&pilha);
+  return result;
 }
