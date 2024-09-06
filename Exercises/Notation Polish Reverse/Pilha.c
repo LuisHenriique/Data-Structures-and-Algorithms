@@ -35,7 +35,7 @@ void pilha_apagar(PILHA **pilha)
   NO *auxp;
   if (pilha != NULL)
   {
-    while ((*pilha)->top != NULL && !(pilha_vazia(pilha)))
+    while ((*pilha)->top != NULL && !(pilha_vazia((*pilha))))
     {
       auxp = (*pilha)->top;
       (*pilha)->top = (*pilha)->top->previous;
@@ -125,76 +125,81 @@ float rpn(char *sequencia)
   int i;
   char caracter_atual;
   PILHA *pilha;
-  ITEM *item, *itemFinalResult;
-  pilha = pilha_criar;
+  pilha = pilha_criar();
 
   // loop que vai até o final da string
   for (i = 0; (caracter_atual = sequencia[i]) != '\0'; i++)
   {
     if (caracter_atual != '+' && caracter_atual != '-' && caracter_atual != '*' && caracter_atual != '/')
     {
-
-      // empilhamos todos os operandos excetos os operadores
-      char *copy = (char *)malloc(sizeof(char)); // criado para evitar que caracter_atual sempre aponte para o último caracter lido da string
-      copy = caracter_atual;
-      item = item_criar(i, copy);
-      pilha_empilhar(pilha, item);
+      float *copy = (float *)malloc(sizeof(float)); // criado para evitar que caracter_atual sempre aponte para o último caracter lido da string
+      *copy = (caracter_atual - '0');               // Converte o caractere para número com base na tabela ASCII
+      ITEM *item = item_criar(i, copy);
+      pilha_empilhar(pilha, item); // empilhamos todos os operandos excetos os operadores
     }
-    if (caracter_atual == '+' || caracter_atual == '-' || caracter_atual == '*' || caracter_atual == '/')
+    else
     {
 
       // desempilha os operandos
       ITEM *opA = pilha_desempilhar(pilha);
       ITEM *opB = pilha_desempilhar(pilha);
-      ITEM *result_operacao;
 
-      char *operandoA = item_get_dados(opA);
-      char *operandoB = item_get_dados(opB);
+      float *operandoA = item_get_dados(opA);
+      float *operandoB = item_get_dados(opB);
 
-      // operação utilizando a tabela ASCII devido que estamos trabalhos com carateres da string, subtraindo por '0' obtemos os valores númericos na tabela ASCII, como as vez mandamos um float, não é necessário o cálculo
       float numberA, numberB;
-      if (*operandoA == sizeof(char) || *operandoB == sizeof(char))
-      {
-        numberA = *operandoA - '0';
-        numberB = *operandoB - '0';
-      }
-      else
-      {
-        numberA = *operandoA;
-        numberB = *operandoB;
-      }
-      float result;
 
+      numberA = *operandoA;
+      numberB = *operandoB;
+
+      float result;
       // realiza as operações e empilha novamente, de acordo com a operação
-      if (caracter_atual == '+')
+      switch (caracter_atual)
       {
-        result = numberA + numberB;
-        result_operacao = item_criar(i, &result);
-        pilha_empilhar(pilha, result_operacao);
+      case '+':
+        result = numberB + numberA;
+
+        break;
+      case '-':
+        result = numberB - numberA;
+
+        break;
+
+      case '*':
+        result = numberB * numberA;
+
+        break;
+
+      case '/':
+        result = numberB / numberA;
+        break;
       }
-      if (caracter_atual == '-')
+
+      float *resultAllocation = (float *)malloc(sizeof(float));
+
+      if (resultAllocation == NULL)
       {
-        result = numberA - numberB;
-        result_operacao = item_criar(i, &result);
-        pilha_empilhar(pilha, result_operacao);
+        exit(1);
       }
-      if (caracter_atual == '/')
-      {
-        result = numberA / numberB;
-        result_operacao = item_criar(i, &result);
-        pilha_empilhar(pilha, result_operacao);
-      }
-      if (caracter_atual == '*')
-      {
-        result = numberA * numberB;
-        result_operacao = item_criar(i, &result);
-        pilha_empilhar(pilha, result_operacao);
-      }
+      *resultAllocation = result;
+      ITEM *result_operacao = item_criar(i, resultAllocation);
+
+      pilha_empilhar(pilha, result_operacao);
+      free(operandoA);
+      free(operandoB);
+      item_apagar(&opA);
+      item_apagar(&opB);
     }
   }
 
+  ITEM *itemFinalResult = NULL;
   itemFinalResult = pilha_desempilhar(pilha);
   float *resultFinal = item_get_dados(itemFinalResult);
+  float resultado = *resultFinal;
+
   pilha_apagar(&pilha);
-  return (*resultFinal);
+  free(resultFinal);
+  item_apagar(&itemFinalResult);
+
+  return resultado;
 }

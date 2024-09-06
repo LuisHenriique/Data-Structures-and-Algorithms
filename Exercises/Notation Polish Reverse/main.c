@@ -6,15 +6,20 @@
 
 int main()
 {
-  char *str[100];
+  char str[100];
   PILHA *p;
-  ITEM *it;
   p = pilha_criar();
-  while (str != "sair")
+
+  int n;
+  int i = 0;
+  printf("Qtda:\n");
+  scanf("%d", &n);
+  while (i < n)
   {
     scanf(" %s", str);
     float result = rpn(str);
-    printf("%f", result);
+    printf("\nresult: %.2f\n", result);
+    i++;
   }
 
   pilha_apagar(&p);

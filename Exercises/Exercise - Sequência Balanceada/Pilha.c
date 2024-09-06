@@ -94,7 +94,7 @@ bool balanceada(char *sequencia)
   PILHA *pilha = pilha_criar();
   char caractereAtual;
   int i;
-  for (i = 0; (caractereAtual = sequencia[i]) != '\0'; i++)
+  for (i = 0; (caractereAtual = sequencia[i]); i++)
   {
     if (caractereAtual == '(' || caractereAtual == '{' || caractereAtual == '[')
     {

@@ -1,7 +1,7 @@
-all: item.o Pilha.o main.o
-	gcc item.o Pilha.o main.o -o main -std=c99 -Wall
+all: main.o item.o Pilha.o
+	gcc main.o item.o Pilha.o -o main -std=c99 -Wall
 main.o: 
-	gcc -c main.o
+	gcc -c main.c
 
 item.o:
 	gcc -c item.c
