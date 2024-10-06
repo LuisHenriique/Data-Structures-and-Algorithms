@@ -41,17 +41,13 @@ bool lista_inserir_nao_ordenada(LISTA *lista, ITEM *item)
   if (lista != NULL && !lista_cheia(lista))
   {
     NO *new = (NO *)malloc(sizeof(NO));
-    NO *aux;
     if (new == NULL)
       exit(1);
 
     new->item = item;
 
     if (lista->length == 0)
-    {
-      aux = new;
       lista->begin = new;
-    }
     else
     {
       lista->end->next = new;
@@ -68,18 +64,24 @@ bool lista_inserir_ordenada(LISTA *lista, ITEM *item, int chave)
   if (lista != NULL && !lista_cheia(lista))
   {
     NO *new = (NO *)malloc(sizeof(NO));
-    NO *p, *aux;
+    NO *p = NULL;
+    NO *aux = NULL;
+
     if (new == NULL)
+    {
       exit(1);
+    }
 
     new->item = item;
+    new->next = NULL;
 
     // Inserção para caso a lista estiver vazia
     if (lista->length == 0)
     {
       lista->begin = new;
       lista->end = new;
-      new->next = NULL;
+      lista->length++;
+      return true;
     }
 
     // Sistema de busca da inserção ordenada
@@ -91,23 +93,19 @@ bool lista_inserir_ordenada(LISTA *lista, ITEM *item, int chave)
       p = p->next;
     }
 
-    if (p != NULL)
+    // Caso de quando a inserção é no início
+    if (p == lista->begin)
     {
-
-      // Caso de quando a inserção é no início
-      if (p == lista->begin)
-      {
-        lista->begin = new;
-        new->next = p;
-      }
-      // Para as demais
-      aux->next = new;
+      lista->begin = new;
       new->next = p;
     }
-    // ajustando quando o ponteiro fim para quando a inserção for no final
-    if (lista->end == aux)
+    else
     {
-      lista->end = new;
+      aux->next = new;
+      new->next = p;
+
+      if (p == NULL)
+        lista->end = new;
     }
 
     lista->length++;
@@ -145,7 +143,6 @@ ITEM *lista_remover(LISTA *lista, int chave)
 
     if (p != NULL)
     {
-      it = p->item; // guarda o conteúdo do nó que será removido
 
       if (p == lista->begin)
       {
@@ -155,17 +152,17 @@ ITEM *lista_remover(LISTA *lista, int chave)
       {
         aux->next = p->next;
       }
+      p->next = NULL;
 
       if (p == lista->end) // ajustando o ponteiro fim
         lista->end = aux;
 
-      p->next = NULL;
+      it = p->item; // guarda o conteúdo do nó que será removido
+      lista->length--;
       free(p);
       p = NULL;
-      lista->length--;
+      return it;
     }
-
-    return it;
   }
 
   return NULL;
@@ -189,9 +186,12 @@ bool lista_apagar(LISTA **lista)
     }
 
     free(*lista);
+    (*lista) = NULL;
 
     return true;
   }
+
+  return false;
 }
 ITEM *lista_busca(LISTA *lista, int chave)
 {
@@ -220,8 +220,7 @@ int lista_tamanho(LISTA *lista)
 }
 bool lista_vazia(LISTA *lista)
 {
-  if (lista != NULL)
-    return (lista->length == 0) ? true : false;
+  return lista != NULL && lista->length == 0;
 }
 bool lista_cheia(LISTA *lista)
 {
@@ -241,7 +240,6 @@ void lista_imprimir(LISTA *lista)
 {
   if (lista != NULL && !lista_vazia(lista))
   {
-    int i;
     NO *p;
     p = lista->begin;
 
